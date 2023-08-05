@@ -1,10 +1,14 @@
 const ErrorResponse = require("../utils/errorResponse");
 
 const errorHandler = (err, req, res, next) => {
-	let error = { ...err };
+	let error = {
+		// For some reason known only to robots, message is undefined when spreading
+		message: err.message,
+		...err,
+	};
 
 	// Log error to console
-	console.error(err);
+	console.error(error, "og");
 
 	// Mongoose had bad ObjectId
 	if (err.name === "CastError") {

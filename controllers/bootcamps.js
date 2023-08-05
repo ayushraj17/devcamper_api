@@ -1,6 +1,6 @@
 const asyncHandler = require("../middlewares/asyncHandler");
-const bootcamp = require("../models/bootcamp");
-const Bootcamp = require("../models/bootcamp");
+const bootcamp = require("../models/Bootcamp");
+const Bootcamp = require("../models/Bootcamp");
 const ErrorResponse = require("../utils/errorResponse");
 const geocoder = require("../utils/geocoder");
 
@@ -34,7 +34,7 @@ exports.getAllBootcamps = asyncHandler(async (req, res, next) => {
 	);
 
 	// Finding Resource
-	query = Bootcamp.find(JSON.parse(queryString));
+	query = Bootcamp.find(JSON.parse(queryString)).populate("courses");
 
 	// Select fields
 	if (req.query.select) {
@@ -68,14 +68,12 @@ exports.getAllBootcamps = asyncHandler(async (req, res, next) => {
 
 	// Execute query
 	const bootcamps = await query;
-	res
-		.status(200)
-		.json({
-			success: true,
-			count: bootcamps.length,
-			data: bootcamps,
-			...pagination,
-		});
+	res.status(200).json({
+		success: true,
+		count: bootcamps.length,
+		data: bootcamps,
+		...pagination,
+	});
 });
 
 /**
@@ -131,7 +129,7 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
  * @access Private
  */
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
-	const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+	const bootcamp = await Bootcamp.findOneAndDelete({ _id: req.params.id });
 	if (!bootcamp) {
 		return next(
 			new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
