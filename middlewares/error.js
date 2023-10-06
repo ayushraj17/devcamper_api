@@ -21,10 +21,14 @@ const errorHandler = (err, req, res, next) => {
 		const message = `Duplicate field(s) entered: ${Object.keys(
 			err.keyValue
 		).join(", ")}`;
-		error = new ErrorResponse(message, 400);
+		const fieldError = err.keyValue;
+		for (key in err.keyValue) {
+			fieldError[key] = `${key} already exists`;
+		}
+		error = new ErrorResponse(message, 400, fieldError);
 	}
 	if (err.name === "ValidationError") {
-		const message = "Field Errors";
+		const message = "Validation Error(s)";
 		const fieldError = {};
 		for (key in err.errors) {
 			fieldError[key] = err.errors[key].message;

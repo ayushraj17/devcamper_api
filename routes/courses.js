@@ -4,6 +4,7 @@ const controllers = require("../controllers/courses");
 const Course = require("../models/Course");
 
 // Middlewares
+const { protect, authorize } = require("../middlewares/auth");
 const advancedResults = require("../middlewares/advanceResults");
 
 const router = express.Router({ mergeParams: true });
@@ -17,11 +18,11 @@ router
 		}),
 		controllers.getCourses
 	)
-	.post(controllers.addCourse);
+	.post(protect, authorize("publisher", "admin"), controllers.addCourse);
 router
 	.route("/:id")
 	.get(controllers.getCourse)
-	.put(controllers.updateCourse)
-	.delete(controllers.deleteCourse);
+	.put(protect, authorize("publisher", "admin"), controllers.updateCourse)
+	.delete(protect, authorize("publisher", "admin"), controllers.deleteCourse);
 
 module.exports = router;
